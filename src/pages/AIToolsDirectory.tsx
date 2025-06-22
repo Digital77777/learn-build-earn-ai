@@ -11,44 +11,89 @@ import { Search, Star, ExternalLink, Filter } from 'lucide-react';
 const AIToolsDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const categories = ['All', 'Writing', 'Design', 'Code', 'Marketing', 'Analytics', 'Video', 'Audio'];
+  const categories = ['All', 'Image Generation', 'Text Tools', 'Productivity', 'Data Analysis', 'Automation', 'Machine Learning', 'Collaboration'];
   
   const tools = [
     {
-      name: 'GPT-4 Turbo',
-      category: 'Writing',
-      description: 'Advanced language model for content creation, coding, and analysis',
+      name: 'AI Image Generator',
+      category: 'Image Generation',
+      description: 'Generate stunning images from text descriptions with advanced AI',
+      rating: 4.8,
+      price: 'Freemium',
+      image: '🎨',
+      features: ['Text to Image', 'Style Transfer', 'High Resolution']
+    },
+    {
+      name: 'AI Text Summarizer',
+      category: 'Text Tools',
+      description: 'Instantly summarize long documents and articles with AI precision',
+      rating: 4.7,
+      price: 'Freemium',
+      image: '📄',
+      features: ['Document Summary', 'Key Points', 'Multiple Formats']
+    },
+    {
+      name: 'AI Presentation Maker',
+      category: 'Productivity',
+      description: 'Create professional presentations automatically from your content',
+      rating: 4.6,
+      price: 'Freemium',
+      image: '📊',
+      features: ['Auto Design', 'Smart Layout', 'Export Options']
+    },
+    {
+      name: 'AI Language Translator',
+      category: 'Text Tools',
+      description: 'Translate text between 100+ languages with contextual accuracy',
       rating: 4.9,
       price: 'Freemium',
+      image: '🌐',
+      features: ['100+ Languages', 'Context Aware', 'Real-time Translation']
+    },
+    {
+      name: 'InsightLite',
+      category: 'Data Analysis',
+      description: 'Analyze data patterns and generate insights from your datasets',
+      rating: 4.5,
+      price: 'Freemium',
+      image: '📈',
+      features: ['Pattern Recognition', 'Visual Charts', 'Export Reports']
+    },
+    {
+      name: 'TaskBot Mini',
+      category: 'Automation',
+      description: 'Automate repetitive tasks and workflows with simple AI commands',
+      rating: 4.4,
+      price: 'Freemium',
       image: '🤖',
-      features: ['Text Generation', 'Code Assistance', 'Analysis']
+      features: ['Task Automation', 'Workflow Builder', 'Schedule Tasks']
     },
     {
-      name: 'Midjourney',
-      category: 'Design',
-      description: 'AI-powered image generation from text descriptions',
-      rating: 4.8,
-      price: 'Paid',
-      image: '🎨',
-      features: ['Image Generation', 'Art Creation', 'Style Transfer']
-    },
-    {
-      name: 'GitHub Copilot',
-      category: 'Code',
-      description: 'AI pair programmer that helps you write code faster',
-      rating: 4.7,
-      price: 'Paid',
-      image: '💻',
-      features: ['Code Completion', 'Documentation', 'Refactoring']
-    },
-    {
-      name: 'Jasper AI',
-      category: 'Marketing',
-      description: 'AI copywriting tool for marketing content and campaigns',
+      name: 'CopyCraft Free',
+      category: 'Text Tools',
+      description: 'Generate compelling copy for marketing, emails, and social media',
       rating: 4.6,
-      price: 'Paid',
-      image: '📝',
-      features: ['Copywriting', 'SEO Content', 'Social Media']
+      price: 'Freemium',
+      image: '✍️',
+      features: ['Marketing Copy', 'Email Templates', 'Social Media']
+    },
+    {
+      name: 'AI Basic Simulator',
+      category: 'Machine Learning',
+      description: 'Simple ML model training and testing environment for beginners',
+      rating: 4.3,
+      price: 'Freemium',
+      image: '🧠',
+      features: ['Model Training', 'Data Visualization', 'Easy Interface']
+    },
+    {
+      name: 'Forum Assistant',
+      category: 'Collaboration',
+      description: 'AI-powered forum moderation and community management tools',
+      rating: 4.5,
+      price: 'Freemium',
+      image: '💬',
+      features: ['Auto Moderation', 'Topic Suggestions', 'User Engagement']
     }
   ];
 
@@ -129,7 +174,7 @@ const AIToolsDirectory = () => {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <Badge className={tool.price === 'Freemium' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}>
+                    <Badge className="bg-green-100 text-green-800">
                       {tool.price}
                     </Badge>
                     <Button size="sm" className="flex items-center gap-2">
