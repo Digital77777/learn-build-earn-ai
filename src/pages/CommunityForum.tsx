@@ -19,7 +19,7 @@ const CommunityForum = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('forum_posts')
         .select(`
           *,
@@ -155,11 +155,11 @@ const CommunityForum = () => {
                           <div className="flex items-center gap-6 text-sm text-gray-600">
                             <span className="flex items-center gap-1">
                               <MessageCircle size={16} />
-                              {post.replies_count} replies
+                              {post.replies_count || 0} replies
                             </span>
                             <span className="flex items-center gap-1">
                               <Heart size={16} />
-                              {post.likes_count} likes
+                              {post.likes_count || 0} likes
                             </span>
                           </div>
                         </CardContent>
