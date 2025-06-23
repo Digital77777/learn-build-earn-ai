@@ -19,7 +19,7 @@ const CommunityForum = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('forum_posts')
         .select(`
           *,
