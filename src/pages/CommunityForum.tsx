@@ -1,76 +1,70 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import CreatePostDialog from '../components/CreatePostDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Search, MessageCircle, Heart, User, Clock, TrendingUp } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const CommunityForum = () => {
-  const categories = [
-    { name: 'General Discussion', posts: 1250, color: 'bg-blue-100 text-blue-800' },
-    { name: 'AI Tools & Reviews', posts: 890, color: 'bg-green-100 text-green-800' },
-    { name: 'Learning & Tutorials', posts: 2100, color: 'bg-purple-100 text-purple-800' },
-    { name: 'Project Showcase', posts: 650, color: 'bg-orange-100 text-orange-800' },
-    { name: 'Job Board', posts: 340, color: 'bg-pink-100 text-pink-800' },
-    { name: 'Technical Support', posts: 780, color: 'bg-red-100 text-red-800' }
-  ];
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { user } = useAuth();
 
-  const trendingTopics = [
-    {
-      title: 'How to get started with GPT-4 API integration?',
-      author: 'Sarah Chen',
-      replies: 23,
-      likes: 45,
-      timeAgo: '2 hours ago',
-      category: 'Technical Support',
-      isHot: true
-    },
-    {
-      title: 'Showcase: AI-powered content generator I built',
-      author: 'Mike Johnson',
-      replies: 18,
-      likes: 67,
-      timeAgo: '4 hours ago',
-      category: 'Project Showcase',
-      isHot: true
-    },
-    {
-      title: 'Best practices for fine-tuning language models',
-      author: 'Dr. Emily Rodriguez',
-      replies: 34,
-      likes: 89,
-      timeAgo: '6 hours ago',
-      category: 'Learning & Tutorials',
-      isHot: false
-    },
-    {
-      title: 'Remote AI Engineer position at TechCorp',
-      author: 'TechRecruiter',
-      replies: 12,
-      likes: 28,
-      timeAgo: '8 hours ago',
-      category: 'Job Board',
-      isHot: false
-    },
-    {
-      title: 'Midjourney vs DALL-E 3 - Detailed comparison',
-      author: 'Alex Thompson',
-      replies: 41,
-      likes: 92,
-      timeAgo: '12 hours ago',
-      category: 'AI Tools & Reviews',
-      isHot: true
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('forum_posts')
+        .select(`
+          *,
+          user_profiles(username, avatar_url)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const categories = [
+    { name: 'General Discussion', posts: posts.filter(p => p.category === 'General Discussion').length, color: 'bg-blue-100 text-blue-800' },
+    { name: 'AI Tools & Reviews', posts: posts.filter(p => p.category === 'AI Tools & Reviews').length, color: 'bg-green-100 text-green-800' },
+    { name: 'Learning & Tutorials', posts: posts.filter(p => p.category === 'Learning & Tutorials').length, color: 'bg-purple-100 text-purple-800' },
+    { name: 'Project Showcase', posts: posts.filter(p => p.category === 'Project Showcase').length, color: 'bg-orange-100 text-orange-800' },
+    { name: 'Job Board', posts: posts.filter(p => p.category === 'Job Board').length, color: 'bg-pink-100 text-pink-800' },
+    { name: 'Technical Support', posts: posts.filter(p => p.category === 'Technical Support').length, color: 'bg-red-100 text-red-800' }
   ];
 
-  const topContributors = [
-    { name: 'Sarah Chen', posts: 145, reputation: 2890, avatar: 'SC' },
-    { name: 'Mike Johnson', posts: 132, reputation: 2650, avatar: 'MJ' },
-    { name: 'Dr. Emily Rodriguez', posts: 89, reputation: 3200, avatar: 'ER' }
-  ];
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.content.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <Header />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-lg">Loading forum...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -78,7 +72,6 @@ const CommunityForum = () => {
       
       <main className="py-12 px-4">
         <div className="container mx-auto">
-          {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Community Forum</h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -86,18 +79,20 @@ const CommunityForum = () => {
             </p>
           </div>
 
-          {/* Search */}
           <div className="mb-8">
             <div className="relative max-w-2xl mx-auto">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-              <Input placeholder="Search discussions..." className="pl-10 pr-4" />
+              <Input 
+                placeholder="Search discussions..." 
+                className="pl-10 pr-4"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">
-            {/* Main Content */}
             <div className="lg:col-span-3">
-              {/* Categories */}
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Forum Categories</h2>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -116,67 +111,66 @@ const CommunityForum = () => {
                 </div>
               </div>
 
-              {/* Trending Topics */}
               <div>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">Trending Discussions</h2>
-                  <Button>
-                    <MessageCircle size={16} className="mr-2" />
-                    New Post
-                  </Button>
+                  <h2 className="text-2xl font-bold text-gray-900">Recent Discussions</h2>
+                  {user && <CreatePostDialog onPostCreated={fetchPosts} />}
                 </div>
                 
-                <div className="space-y-4">
-                  {trendingTopics.map((topic, index) => (
-                    <Card key={index} className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="outline">{topic.category}</Badge>
-                              {topic.isHot && (
-                                <Badge className="bg-red-500 text-white">
-                                  🔥 Hot
-                                </Badge>
-                              )}
+                {filteredPosts.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-gray-600 mb-4">No posts found.</p>
+                    {user && (
+                      <CreatePostDialog onPostCreated={fetchPosts} />
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {filteredPosts.map((post) => (
+                      <Card key={post.id} className="hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="outline">{post.category}</Badge>
+                              </div>
+                              <CardTitle className="text-lg leading-tight hover:text-blue-600">
+                                {post.title}
+                              </CardTitle>
+                              <CardDescription className="mt-2 flex items-center gap-4">
+                                <span className="flex items-center gap-1">
+                                  <User size={14} />
+                                  {post.user_profiles?.username || 'Anonymous'}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock size={14} />
+                                  {new Date(post.created_at).toLocaleDateString()}
+                                </span>
+                              </CardDescription>
                             </div>
-                            <CardTitle className="text-lg leading-tight hover:text-blue-600">
-                              {topic.title}
-                            </CardTitle>
-                            <CardDescription className="mt-2 flex items-center gap-4">
-                              <span className="flex items-center gap-1">
-                                <User size={14} />
-                                {topic.author}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Clock size={14} />
-                                {topic.timeAgo}
-                              </span>
-                            </CardDescription>
                           </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center gap-6 text-sm text-gray-600">
-                          <span className="flex items-center gap-1">
-                            <MessageCircle size={16} />
-                            {topic.replies} replies
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Heart size={16} />
-                            {topic.likes} likes
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-gray-600 mb-4 line-clamp-2">{post.content}</p>
+                          <div className="flex items-center gap-6 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <MessageCircle size={16} />
+                              {post.replies_count} replies
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Heart size={16} />
+                              {post.likes_count} likes
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Sidebar */}
             <div className="lg:col-span-1">
-              {/* Stats */}
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -187,45 +181,19 @@ const CommunityForum = () => {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Total Members</span>
-                      <span className="font-semibold">50,247</span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-gray-600">Total Posts</span>
-                      <span className="font-semibold">125,890</span>
+                      <span className="font-semibold">{posts.length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Active Today</span>
-                      <span className="font-semibold text-green-600">2,847</span>
+                      <span className="text-gray-600">Categories</span>
+                      <span className="font-semibold">{categories.length}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">New This Week</span>
-                      <span className="font-semibold text-blue-600">1,234</span>
+                      <span className="text-gray-600">Active Users</span>
+                      <span className="font-semibold text-green-600">
+                        {new Set(posts.map(p => p.user_id)).size}
+                      </span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Top Contributors */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Top Contributors</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {topContributors.map((contributor, index) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                          {contributor.avatar}
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-semibold text-sm">{contributor.name}</div>
-                          <div className="text-xs text-gray-600">
-                            {contributor.posts} posts • {contributor.reputation} rep
-                          </div>
-                        </div>
-                      </div>
-                    ))}
                   </div>
                 </CardContent>
               </Card>

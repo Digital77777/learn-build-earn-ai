@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Play, Clock, Users, BookOpen, Award } from 'lucide-react';
 
 const LearningHub = () => {
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
 
   const courses = [
     {
@@ -20,7 +20,7 @@ const LearningHub = () => {
       rating: 4.9,
       progress: 0,
       level: 'Intermediate',
-      videoId: 'PLkDaE6sCZn6Ec-XTbcX1uRg2_u4xOEky0',
+      videoId: 'aircAruvnKk',
       topics: ['Neural networks', 'CNNs', 'RNNs', 'sequence models'],
       price: 'Free'
     },
@@ -32,7 +32,7 @@ const LearningHub = () => {
       rating: 4.8,
       progress: 0,
       level: 'Beginner',
-      videoId: 'PLhQjrBD2T382_R182iC2gNZI9HzWFMC_8',
+      videoId: 'jIohbD7almo',
       topics: ['Search algorithms', 'ML', 'neural networks', 'NLP'],
       price: 'Free'
     },
@@ -44,7 +44,7 @@ const LearningHub = () => {
       rating: 4.9,
       progress: 0,
       level: 'Intermediate',
-      videoId: 'PLkDaE6sCZn6F6wUI9tvS_Gw1vaFAx6rd6',
+      videoId: 'njKP3FqW3Sk',
       topics: ['Deep learning theory', 'TensorFlow', 'applications'],
       price: 'Free'
     },
@@ -68,7 +68,7 @@ const LearningHub = () => {
       rating: 4.8,
       progress: 0,
       level: 'Beginner',
-      videoId: 'PLkDaE6sCZn6F6wUI9tvS_Gw1vaFAx6rd6',
+      videoId: 'UFOMNNPqTj8',
       topics: ['AI strategy', 'applications', 'ethics'],
       price: 'Free'
     },
@@ -80,7 +80,7 @@ const LearningHub = () => {
       rating: 4.6,
       progress: 0,
       level: 'Intermediate',
-      videoId: 'PLQVvvaa0QuDdttJXlLtAJxJetJcqmqlQq',
+      videoId: 'Wo5dMEP_BbI',
       topics: ['Coding neural networks', 'Python implementation'],
       price: 'Free'
     },
@@ -92,7 +92,7 @@ const LearningHub = () => {
       rating: 4.9,
       progress: 0,
       level: 'Intermediate',
-      videoId: 'PLfYUBJiXbdtSL3ajtG6lbiFdlIP_hjWlG',
+      videoId: '0oyCUWLL_fU',
       topics: ['Vision', 'NLP', 'tabular models', 'PyTorch'],
       price: 'Free'
     },
@@ -116,7 +116,7 @@ const LearningHub = () => {
       rating: 4.8,
       progress: 0,
       level: 'Intermediate',
-      videoId: 'PLAwxTw4SYaPnMwH3z3tqsI_eVmSRk8fZb',
+      videoId: 'kKYDdRQs8UA',
       topics: ['Path planning', 'localization', 'filtering'],
       price: 'Free'
     },
@@ -155,7 +155,7 @@ const LearningHub = () => {
     }
   ];
 
-  const handleWatchCourse = (course) => {
+  const handleWatchCourse = (course: any) => {
     setSelectedCourse(course);
   };
 
@@ -190,7 +190,7 @@ const LearningHub = () => {
             </div>
             <div className="p-4">
               <div className="flex flex-wrap gap-2 mb-2">
-                {selectedCourse.topics.map((topic, idx) => (
+                {selectedCourse.topics.map((topic: string, idx: number) => (
                   <Badge key={idx} variant="secondary" className="text-xs">
                     {topic}
                   </Badge>
@@ -204,7 +204,6 @@ const LearningHub = () => {
       
       <main className="py-12 px-4">
         <div className="container mx-auto">
-          {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Learning Hub</h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
