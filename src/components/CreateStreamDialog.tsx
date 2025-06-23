@@ -22,18 +22,36 @@ const CreateStreamDialog = ({ onStreamCreated }: { onStreamCreated?: () => void 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to create a stream",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!title.trim() || !category) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('ai_streams')
         .insert({
-          title,
-          description,
+          title: title.trim(),
+          description: description.trim() || null,
           category,
           scheduled_for: scheduledFor ? new Date(scheduledFor).toISOString() : null,
           user_id: user.id,
+          is_live: false,
+          viewers_count: 0
         });
 
       if (error) throw error;
@@ -50,9 +68,10 @@ const CreateStreamDialog = ({ onStreamCreated }: { onStreamCreated?: () => void 
       setScheduledFor('');
       onStreamCreated?.();
     } catch (error) {
+      console.error('Error creating stream:', error);
       toast({
         title: "Error",
-        description: "Failed to create stream",
+        description: "Failed to create stream. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -68,40 +87,58 @@ const CreateStreamDialog = ({ onStreamCreated }: { onStreamCreated?: () => void 
           Create Stream
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create AI Stream</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
-            placeholder="Stream title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-          <Textarea
-            placeholder="Stream description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-          <Select value={category} onValueChange={setCategory} required>
-            <SelectTrigger>
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="Tutorial">Tutorial</SelectItem>
-              <SelectItem value="Workshop">Workshop</SelectItem>
-              <SelectItem value="Discussion">Discussion</SelectItem>
-              <SelectItem value="Panel">Panel</SelectItem>
-              <SelectItem value="Masterclass">Masterclass</SelectItem>
-            </SelectContent>
-          </Select>
-          <Input
-            type="datetime-local"
-            placeholder="Schedule for (optional)"
-            value={scheduledFor}
-            onChange={(e) => setScheduledFor(e.target.value)}
-          />
+          <div>
+            <Input
+              placeholder="Stream title *"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              maxLength={100}
+            />
+          </div>
+          
+          <div>
+            <Textarea
+              placeholder="Stream description (optional)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              maxLength={500}
+            />
+          </div>
+          
+          <div>
+            <Select value={category} onValueChange={setCategory} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category *" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Tutorial">Tutorial</SelectItem>
+                <SelectItem value="Workshop">Workshop</SelectItem>
+                <SelectItem value="Discussion">Discussion</SelectItem>
+                <SelectItem value="Panel">Panel</SelectItem>
+                <SelectItem value="Masterclass">Masterclass</SelectItem>
+                <SelectItem value="Demo">Demo</SelectItem>
+                <SelectItem value="Q&A">Q&A Session</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Input
+              type="datetime-local"
+              placeholder="Schedule for (optional)"
+              value={scheduledFor}
+              onChange={(e) => setScheduledFor(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+            />
+          </div>
+          
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? 'Creating...' : 'Create Stream'}
           </Button>

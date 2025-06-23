@@ -3,10 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CreateStreamDialog from '../components/CreateStreamDialog';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Play, Users, Calendar, Clock, Mic, Video } from 'lucide-react';
+import StreamCard from '../components/streams/StreamCard';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -17,7 +14,7 @@ const AIStreams = () => {
 
   const fetchStreams = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('ai_streams')
         .select(`
           *,
@@ -78,44 +75,9 @@ const AIStreams = () => {
                 <h2 className="text-2xl font-bold text-gray-900">Live Now</h2>
               </div>
               
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {liveStreams.map((stream) => (
-                  <Card key={stream.id} className="hover:shadow-lg transition-shadow duration-300">
-                    <div className="relative">
-                      <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
-                        <Play size={48} className="text-blue-600" />
-                      </div>
-                      <div className="absolute top-4 left-4">
-                        <Badge className="bg-red-500 text-white">
-                          🔴 LIVE
-                        </Badge>
-                      </div>
-                      <div className="absolute top-4 right-4">
-                        <Badge variant="secondary" className="bg-black/50 text-white">
-                          <Users size={12} className="mr-1" />
-                          {stream.viewers_count}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <CardHeader>
-                      <Badge variant="outline" className="mb-2 w-fit">{stream.category}</Badge>
-                      <CardTitle className="text-lg leading-tight">{stream.title}</CardTitle>
-                      <CardDescription className="mt-2">
-                        By {stream.user_profiles?.username || 'Anonymous'}
-                      </CardDescription>
-                    </CardHeader>
-                    
-                    <CardContent>
-                      {stream.description && (
-                        <p className="text-sm text-gray-600 mb-4">{stream.description}</p>
-                      )}
-                      <Button className="w-full">
-                        <Video size={16} className="mr-2" />
-                        Watch Live
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <StreamCard key={stream.id} stream={stream} isLive={true} />
                 ))}
               </div>
             </div>
@@ -137,42 +99,7 @@ const AIStreams = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {upcomingStreams.map((stream) => (
-                  <Card key={stream.id} className="hover:shadow-lg transition-shadow duration-300">
-                    <div className="relative">
-                      <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-t-lg flex items-center justify-center">
-                        <Play size={48} className="text-blue-600" />
-                      </div>
-                      <div className="absolute top-4 right-4">
-                        <Badge className="bg-blue-500">
-                          {stream.scheduled_for ? 'Scheduled' : 'Draft'}
-                        </Badge>
-                      </div>
-                    </div>
-                    
-                    <CardHeader>
-                      <Badge variant="outline" className="mb-2 w-fit">{stream.category}</Badge>
-                      <CardTitle className="text-lg leading-tight">{stream.title}</CardTitle>
-                      <CardDescription className="mt-2">
-                        By {stream.user_profiles?.username || 'Anonymous'}
-                      </CardDescription>
-                    </CardHeader>
-                    
-                    <CardContent>
-                      {stream.description && (
-                        <p className="text-sm text-gray-600 mb-4">{stream.description}</p>
-                      )}
-                      {stream.scheduled_for && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                          <Calendar size={16} />
-                          {new Date(stream.scheduled_for).toLocaleDateString()}
-                        </div>
-                      )}
-                      <Button variant="outline" className="w-full">
-                        <Mic size={16} className="mr-2" />
-                        Set Reminder
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <StreamCard key={stream.id} stream={stream} isLive={false} />
                 ))}
               </div>
             )}
