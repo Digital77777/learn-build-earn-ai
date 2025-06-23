@@ -25,7 +25,7 @@ const CreatePostDialog = ({ onPostCreated }: { onPostCreated?: () => void }) => 
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('forum_posts')
         .insert({
           title,
