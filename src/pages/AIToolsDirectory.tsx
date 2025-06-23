@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import ToolInterface from '../components/tools/ToolInterface';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,12 @@ import { Search, Star, ExternalLink, Filter, Zap, Image, FileText, BarChart3, Bo
 const AIToolsDirectory = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [activeTool, setActiveTool] = useState<string | null>(null);
+
+  // If a tool is active, show its interface
+  if (activeTool) {
+    return <ToolInterface toolName={activeTool} onBack={() => setActiveTool(null)} />;
+  }
 
   const categories = ['All', 'Image Generation', 'Text Tools', 'Productivity', 'Data Analysis', 'Automation', 'Machine Learning', 'Collaboration'];
   
@@ -21,48 +27,65 @@ const AIToolsDirectory = () => {
       category: 'Image Generation',
       description: 'Generate stunning images from text descriptions with advanced AI technology. Perfect for creative projects, marketing materials, and artistic exploration.',
       rating: 4.8,
-      price: 'Freemium',
+      price: 'Free',
       icon: <Image className="w-8 h-8 text-purple-600" />,
-      features: ['Text to Image', 'Style Transfer', 'High Resolution', 'Multiple Formats'],
+      features: ['Text to Image', 'Multiple Styles', 'High Resolution', 'Instant Generation'],
       useCases: ['Marketing', 'Design', 'Social Media', 'Art Creation'],
       demoContent: 'Transform your ideas into stunning visuals with just a text description. Our AI understands context, style, and artistic elements to create professional-quality images.',
-      pricing: { free: '10 images/month', pro: 'Unlimited + HD quality' }
+      pricing: { free: 'Unlimited generations', pro: 'HD quality + API access' },
+      hasInterface: true
     },
     {
       name: 'AI Text Summarizer',
       category: 'Text Tools',
       description: 'Instantly summarize long documents and articles with AI precision. Save time by getting key insights from lengthy content.',
       rating: 4.7,
-      price: 'Freemium',
+      price: 'Free',
       icon: <FileText className="w-8 h-8 text-blue-600" />,
-      features: ['Document Summary', 'Key Points', 'Multiple Formats', 'Bulk Processing'],
+      features: ['Document Summary', 'Key Points', 'Multiple Formats', 'Smart Analysis'],
       useCases: ['Research', 'Content Creation', 'News Analysis', 'Academic Work'],
       demoContent: 'Upload documents, paste text, or provide URLs to get concise, accurate summaries that capture the essence of your content.',
-      pricing: { free: '5 summaries/day', pro: 'Unlimited + API access' }
+      pricing: { free: 'Unlimited summaries', pro: 'Bulk processing + API' },
+      hasInterface: true
     },
     {
       name: 'AI Presentation Maker',
       category: 'Productivity',
       description: 'Create professional presentations automatically from your content. Perfect for business meetings, educational content, and project proposals.',
       rating: 4.6,
-      price: 'Freemium',
+      price: 'Free',
       icon: <BarChart3 className="w-8 h-8 text-green-600" />,
       features: ['Auto Design', 'Smart Layout', 'Export Options', 'Template Library'],
       useCases: ['Business', 'Education', 'Sales', 'Training'],
       demoContent: 'Just input your topic or upload content, and watch as AI creates professionally designed slides with relevant layouts and graphics.',
-      pricing: { free: '3 presentations/month', pro: 'Unlimited + premium templates' }
+      pricing: { free: 'Unlimited presentations', pro: 'Premium templates + branding' },
+      hasInterface: true
     },
     {
       name: 'AI Language Translator',
       category: 'Text Tools',
       description: 'Translate text between 100+ languages with contextual accuracy. Perfect for global communication and content localization.',
       rating: 4.9,
-      price: 'Freemium',
+      price: 'Free',
       icon: <MessageSquare className="w-8 h-8 text-indigo-600" />,
-      features: ['100+ Languages', 'Context Aware', 'Real-time Translation', 'Document Support'],
+      features: ['100+ Languages', 'Context Aware', 'Real-time Translation', 'Bulk Processing'],
       useCases: ['Global Business', 'Travel', 'Education', 'Content Localization'],
       demoContent: 'Experience accurate translations that understand context, idioms, and technical terminology across diverse languages.',
-      pricing: { free: '1000 characters/day', pro: 'Unlimited + document translation' }
+      pricing: { free: 'Unlimited translations', pro: 'Document translation + API' },
+      hasInterface: true
+    },
+    {
+      name: 'CopyCraft Free',
+      category: 'Text Tools',
+      description: 'Generate compelling copy for marketing, emails, and social media. AI-powered writing assistant for all your content needs.',
+      rating: 4.6,
+      price: 'Free',
+      icon: <Zap className="w-8 h-8 text-yellow-600" />,
+      features: ['Marketing Copy', 'Email Templates', 'Social Media', 'Multiple Tones'],
+      useCases: ['Digital Marketing', 'Content Creation', 'Email Campaigns', 'Social Media'],
+      demoContent: 'Create engaging headlines, persuasive product descriptions, and compelling ad copy that converts visitors into customers.',
+      pricing: { free: 'Unlimited generations', pro: 'Advanced templates + analytics' },
+      hasInterface: true
     },
     {
       name: 'InsightLite',
@@ -74,7 +97,8 @@ const AIToolsDirectory = () => {
       features: ['Pattern Recognition', 'Visual Charts', 'Export Reports', 'Predictive Analytics'],
       useCases: ['Business Intelligence', 'Market Research', 'Performance Analysis', 'Trend Forecasting'],
       demoContent: 'Upload your data and discover hidden patterns, trends, and correlations with interactive visualizations and detailed reports.',
-      pricing: { free: '1 dataset/week', pro: 'Unlimited datasets + advanced analytics' }
+      pricing: { free: '1 dataset/week', pro: 'Unlimited datasets + advanced analytics' },
+      hasInterface: false
     },
     {
       name: 'TaskBot Mini',
@@ -86,19 +110,8 @@ const AIToolsDirectory = () => {
       features: ['Task Automation', 'Workflow Builder', 'Schedule Tasks', 'Integration Hub'],
       useCases: ['Email Management', 'Data Entry', 'Report Generation', 'Social Media'],
       demoContent: 'Set up automated workflows with drag-and-drop simplicity. Connect your favorite apps and let AI handle the routine tasks.',
-      pricing: { free: '5 automations', pro: 'Unlimited + advanced triggers' }
-    },
-    {
-      name: 'CopyCraft Free',
-      category: 'Text Tools',
-      description: 'Generate compelling copy for marketing, emails, and social media. AI-powered writing assistant for all your content needs.',
-      rating: 4.6,
-      price: 'Freemium',
-      icon: <Zap className="w-8 h-8 text-yellow-600" />,
-      features: ['Marketing Copy', 'Email Templates', 'Social Media', 'SEO Optimization'],
-      useCases: ['Digital Marketing', 'Content Creation', 'Email Campaigns', 'Social Media'],
-      demoContent: 'Create engaging headlines, persuasive product descriptions, and compelling ad copy that converts visitors into customers.',
-      pricing: { free: '1000 words/month', pro: 'Unlimited + advanced templates' }
+      pricing: { free: '5 automations', pro: 'Unlimited + advanced triggers' },
+      hasInterface: false
     },
     {
       name: 'AI Basic Simulator',
@@ -110,7 +123,8 @@ const AIToolsDirectory = () => {
       features: ['Model Training', 'Data Visualization', 'Easy Interface', 'Tutorial Guides'],
       useCases: ['Education', 'Prototyping', 'Research', 'Skill Development'],
       demoContent: 'Build, train, and test machine learning models without coding. Perfect for students and professionals learning AI.',
-      pricing: { free: '3 models/month', pro: 'Unlimited + advanced algorithms' }
+      pricing: { free: '3 models/month', pro: 'Unlimited + advanced algorithms' },
+      hasInterface: false
     },
     {
       name: 'Forum Assistant',
@@ -122,7 +136,8 @@ const AIToolsDirectory = () => {
       features: ['Auto Moderation', 'Topic Suggestions', 'User Engagement', 'Analytics Dashboard'],
       useCases: ['Community Management', 'Customer Support', 'Online Forums', 'Social Platforms'],
       demoContent: 'Automatically moderate discussions, suggest relevant topics, and boost community engagement with AI-driven insights.',
-      pricing: { free: '1 community', pro: 'Unlimited communities + advanced features' }
+      pricing: { free: '1 community', pro: 'Unlimited communities + advanced features' },
+      hasInterface: false
     }
   ];
 
@@ -271,9 +286,13 @@ const AIToolsDirectory = () => {
                           </div>
                         </DialogContent>
                       </Dialog>
-                      <Button size="sm" className="flex items-center gap-2">
+                      <Button 
+                        size="sm" 
+                        className="flex items-center gap-2"
+                        onClick={() => tool.hasInterface ? setActiveTool(tool.name) : window.open('#', '_blank')}
+                      >
                         Try Now
-                        <ExternalLink size={16} />
+                        {!tool.hasInterface && <ExternalLink size={16} />}
                       </Button>
                     </div>
                   </div>
